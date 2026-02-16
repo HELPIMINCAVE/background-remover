@@ -21,12 +21,11 @@ def health():
 
 
 @app.post("/remove-bg")
-async def remove_background(file: UploadFile = File(...)):
-    # Read the uploaded image
+async def remove_bg(file: UploadFile = File(...)):
     input_data = await file.read()
     
-    # Use rembg to remove the background
-    output_data = remove(input_data)
+    # Use the 'u2netp' model (the 'p' stands for 'portable/small')
+    # This uses significantly less RAM than the default model.
+    output_data = remove(input_data, session_name="u2netp")
     
-    # Return the processed image as a response
-    return StreamingResponse(BytesIO(output_data), media_type="image/png")
+    return StreamingResponse(io.BytesIO(output_data), media_type="image/png")
