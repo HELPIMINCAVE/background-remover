@@ -8,15 +8,17 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows local files (origin 'null') to connect
+    allow_origin_regex='.*',  # This is a "catch-all" for any origin, including null
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
 
 @app.post("/remove-bg")
 async def remove_background(file: UploadFile = File(...)):
