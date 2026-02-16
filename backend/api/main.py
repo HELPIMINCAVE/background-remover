@@ -1,8 +1,8 @@
-from fastapi import FastAPI, UploadFile, File, Response
-from rembg import remove
+from io import BytesIO
+from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from PIL import Image
-import io
+from fastapi.responses import StreamingResponse
+from rembg import remove
 
 app = FastAPI()
 
@@ -18,14 +18,13 @@ app.add_middleware(
 def health():
     return {"status": "ok"}
 
-
 @app.post("/remove-bg")
 async def remove_background(file: UploadFile = File(...)):
     # Read the uploaded image
-    input_image = await file.read()
+    input_data = await file.read()
     
-    # Process the image
-    output_image = remove(input_image)
+    # Use rembg to remove the background
+    output_data = remove(input_data)
     
-    # RETURN AS A PROPER IMAGE RESPONSE
-    return Response(content=output_image, media_type="image/png")
+    # Return the processed image as a response
+    return StreamingResponse(BytesIO(output_data), media_type="image/png")
