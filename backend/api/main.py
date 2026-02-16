@@ -8,7 +8,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all websites to access the API (fine for local dev)
+    allow_origins=["*"],  # Allows local files (origin 'null') to connect
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
