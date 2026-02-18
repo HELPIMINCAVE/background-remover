@@ -21,11 +21,8 @@ def health():
 
 
 @app.post("/remove-bg")
-async def remove_bg(file: UploadFile = File(...)):
+async def remove_background(file: UploadFile = File(...)):
     input_data = await file.read()
-    
-    # Use the 'u2netp' model (the 'p' stands for 'portable/small')
-    # This uses significantly less RAM than the default model.
+    # Adding session_name="u2netp" is the secret to staying under the RAM limit
     output_data = remove(input_data, session_name="u2netp")
-    
-    return StreamingResponse(io.BytesIO(output_data), media_type="image/png")
+    return StreamingResponse(BytesIO(output_data), media_type="image/png")
