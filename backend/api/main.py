@@ -2,7 +2,7 @@ from io import BytesIO
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from rembg import remove
+from rembg import remove, new_session
 
 app = FastAPI()
 
@@ -23,6 +23,11 @@ def health():
 @app.post("/remove-bg")
 async def remove_background(file: UploadFile = File(...)):
     input_data = await file.read()
-    # The session_name="u2netp" forces the 4MB model instead of the 176MB one
-    output_data = remove(input_data, session_name="u2netp")
+    
+    # 1. Manually create a tiny session
+    session = new_session("u2netp")
+    
+    # 2. Use that specific session to process the image
+    output_data = remove(input_data, session=session)
+    
     return StreamingResponse(BytesIO(output_data), media_type="image/png")
