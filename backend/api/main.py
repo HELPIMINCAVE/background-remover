@@ -1,33 +1,37 @@
+import requests, os
 from io import BytesIO
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from rembg import remove, new_session
 
 app = FastAPI()
 
+# This pulls the key from Render's settings
+REMOVE_BG_API_KEY = os.getenv("gAJrRs5kFG3Mu5ieVLWqv8WL")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex='.*',  # This is a "catch-all" for any origin, including null
+    allow_origin_regex='.*',
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-
-
 @app.post("/remove-bg")
 async def remove_background(file: UploadFile = File(...)):
+    if not REMOVE_BG_API_KEY:
+        raise HTTPException(status_code=500, detail="API Key not configured on server")
+
     input_data = await file.read()
     
-    # 1. Manually create a tiny session
-    session = new_session("u2netp")
+    response = requests.post(
+        'https://api.remove.bg/v1.0/removebg',
+        files={'image_file': input_data},
+        data={'size': 'auto'},
+        headers={'X-Api-Key': REMOVE_BG_API_KEY},
+    )
     
-    # 2. Use that specific session to process the image
-    output_data = remove(input_data, session=session)
-    
-    return StreamingResponse(BytesIO(output_data), media_type="image/png")
+    if response.status_code == requests.codes.ok:
+        return StreamingResponse(BytesIO(response.content), media_type="image/png")
+    else:
+        raise HTTPException(status_code=response.status_code, detail=response.text)
