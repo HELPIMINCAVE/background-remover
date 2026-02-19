@@ -8,6 +8,7 @@ app = FastAPI()
 
 # This pulls the key from Render's settings
 REMOVE_BG_API_KEY = os.getenv("remove-background")
+print(f"--- SERVER STARTUP: API KEY FOUND = {bool(REMOVE_BG_API_KEY)} ---")
 
 app.add_middleware(
     CORSMiddleware,
