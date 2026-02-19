@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 app = FastAPI()
 
 # This pulls the key from Render's settings
-REMOVE_BG_API_KEY = os.getenv("gAJrRs5kFG3Mu5ieVLWqv8WL")
+REMOVE_BG_API_KEY = os.getenv("REMOVE_BG_API_KEY")
 
 app.add_middleware(
     CORSMiddleware,
